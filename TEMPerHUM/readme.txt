@@ -25,4 +25,10 @@ Build and reading works, but data is uncalibrated
 
 
 x86_64 build instructions @ Fedora 31
+`make`
+
+Raspberry:
+`sudo apt install libusb-1.0-0-dev`
+`make`
+
 
