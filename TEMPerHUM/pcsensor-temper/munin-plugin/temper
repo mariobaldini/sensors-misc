@@ -1,0 +1,172 @@
+#!/bin/bash
+# -*- sh -*-
+
+: << =cut
+
+=head1 NAME
+
+  temper - Munin plugin to monitor temperature with PCsensor/TEMPer
+
+=head1 CONFIGURATION
+
+  Install pcsensor command:
+    git clone https://github.com/shakemid/pcsensor-temper
+    cd pcsensor-temper
+    make
+    cp pcsensor /usr/local/bin/
+
+  Make symlink:
+    cp munin-plugin/temper /opt/munin/lib/plugins/
+    cd /opt/munin/etc/plugins/
+    ln -s /opt/munin/lib/plugins/temper .
+
+=head1 ENVIRONMENT VARIABLES
+
+  env.pcsensor - path to pcsensor command
+    example:  env.pcsensor  /usr/bin/pcsensor
+    default:  /usr/local/bin/pcsensor
+
+  env.device - device number to monitor
+    example:  env.device 1
+    default:  0
+
+  env.cdef - formula for calibration
+    example:  env.cdef  temperature,1.0287,*,0.85,-
+    default:  none
+
+    The formula means temperature * 1.0287 - 0.85
+    For more information about CDEF, see https://oss.oetiker.ch/rrdtool/tut/cdeftutorial.en.html
+
+=head1 EXAMPLE
+
+  Example setting for aggregate multiple temper graphs into one graph,
+
+  [TEMPer]
+    update no
+
+    temper.update no
+    temper.graph_title TEMPer
+    temper.graph_category sensor
+    temper.graph_args --base 1000
+    temper.graph_scale no
+    temper.graph_vlabel Temp C
+
+    temper.graph_order \
+        temperature_1=group;host1:temper.temperature \
+        temperature_2=group;host2:temper.temperature \
+        temperature_3=group;host3:temper.temperature
+
+    temper.temperature_1.cdef temperature_1,1.02,*,0.38,-
+    temper.temperature_2.cdef temperature_2,0.97,*,1.22,-
+    temper.temperature_3.cdef temperature_3,0.93,*,0.55,-
+
+  For more information about graph aggregation,
+  see http://guide.munin-monitoring.org/en/latest/example/graph/aggregate.html
+
+=head1 MEMO
+
+  Device types:
+    0c45:7401 with 1 sensor
+      temperature
+
+    0c45:7401 with 2 sensors
+      internal, external
+
+    0c45:7402
+      temperature, humidity
+
+=head1 AUTHOR
+
+  K.Cima https://github.com/shakemid
+
+=head1 LICENSE
+
+  GPLv2
+
+=head1 Magic markers
+
+  #%# family=contrib
+  #%# capabilities=
+
+=cut
+
+. "${MUNIN_LIBDIR}/plugins/plugin.sh"
+
+set -o nounset
+set -o pipefail
+
+# path to pcsensor
+pcsensor=${pcsensor:-/usr/local/bin/pcsensor}
+
+# device number
+device=${device:-0}
+
+# need calibration
+#   example:
+#     env.cdef  temperature,1.0287,*,0.85,-
+cdef=${cdef:-}
+
+retry=${retry:-1}
+
+autoconf() {
+    echo 'no'
+}
+
+config() {
+    cat <<EOF
+graph_title TEMPer
+graph_category sensors
+graph_scale no
+graph_vlabel Temp C
+graph_args --base 1000
+EOF
+
+    "$pcsensor" | awk '$2 == '"$device"' { print $3 }' |
+    while read -r label
+    do
+        echo "${label}.label ${label}"
+
+        if [ "$label" = 'humidity' ]; then
+            echo "${label}.draw AREA"
+            echo "graph_order humidity temperature"
+        else
+            echo "${label}.draw LINE"
+            if [ -n "$cdef" ]; then
+                echo "${label}.cdef ${cdef}"
+            fi
+        fi
+    done
+}
+
+fetch() {
+    local i ret
+
+    i=0
+    while [ "$i" -le "$retry" ]
+    do
+        "$pcsensor" | awk '$2 == '"$device"' { print $3".value", $4 }'
+        ret=$?
+        if [ "$ret" -eq 0 ]; then
+            break
+        fi
+
+        i=$(( i + 1 ))
+        sleep 5
+    done
+}
+
+# Main
+case ${1:-} in
+autoconf)
+    autoconf
+    ;;
+config)
+    config
+    [ "${MUNIN_CAP_DIRTYCONFIG:-}" = "1" ] && fetch
+    ;;
+*)
+    fetch
+    ;;
+esac
+
+exit 0
