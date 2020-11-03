@@ -1,0 +1,12 @@
+[package]
+name = "quick-modbus"
+version = "0.1.0"
+authors = ["Mario Baldini <mario.baldini@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+libmodbus-rs = "*"
+clap = "*"
+failure = "*"
