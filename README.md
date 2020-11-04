@@ -1,2 +1,3 @@
-# sensors
-Code for reading data from miscellaneous types of sensors
+# Sensors Misc
+
+Miscellaneous tools archive for interfacing with hardware sensors.
