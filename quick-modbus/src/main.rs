@@ -72,9 +72,6 @@ pub fn main() -> Result<(), Error> {
       assert!(modbus.write_bit(register, value_bool).is_ok());
     }
 
-    
-    
-
     _ => {
       println!("Error! Unknown command: {:?}", cmd);
       process::exit(1);
