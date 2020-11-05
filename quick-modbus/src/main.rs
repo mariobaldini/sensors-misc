@@ -17,15 +17,22 @@ use failure::Error;
 
 pub fn main() -> Result<(), Error> {
 
+  const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
+  println!("----------- QUICK-MODBUS  ver. {:} ----------", VERSION);
+  println!("Author: Mario Baldini <mariobaldini@gmail.com>");
+  println!("-----------------------------------------------");
+
   let args: Vec<String> = env::args().collect();
+  let filename = &args[0];
   
   if args.len() != 6 && args.len() != 7 {
     println!("Error! Missing arguments! Received: {:?} \nUsage example:", args);
-    println!("./quick-modbus PORT_NAME    BAUD DEVICE_ADDRESS COMMAND        REGISTER [VALUE]");
-    println!("./quick-modbus /dev/ttyUSB0 9600 1              write_register 1        1");
-    println!("./quick-modbus /dev/ttyUSB0 9600 1              write_coil     1        1");
-    println!("./quick-modbus /dev/ttyUSB0 9600 1              read_register  1         ");
-    println!("./quick-modbus /dev/ttyUSB0 9600 1              read_coil      1         ");
+    println!("./{:} PORT_NAME    BAUD DEVICE_ADDRESS COMMAND        REGISTER [VALUE]", filename);
+    println!("./{:} /dev/ttyUSB0 9600 1              write_register 1        1"      , filename);
+    println!("./{:} /dev/ttyUSB0 9600 1              write_coil     1        1"      , filename);
+    println!("./{:} /dev/ttyUSB0 9600 1              read_register  1         "      , filename);
+    println!("./{:} /dev/ttyUSB0 9600 1              read_coil      1         "      , filename);
     process::exit(1);
   }
 
