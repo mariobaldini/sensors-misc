@@ -26,7 +26,7 @@ pub fn main() -> Result<(), Error> {
   let args: Vec<String> = env::args().collect();
   let filename = &args[0];
   
-  if args.len() != 6 && args.len() != 7 {
+  if args.len() != 6 || args.len() != 7 {
     println!("Error! Missing arguments! Received: {:?} \nUsage example:", args);
     println!("./{:} PORT_NAME    BAUD DEVICE_ADDRESS COMMAND        REGISTER [VALUE]", filename);
     println!("./{:} /dev/ttyUSB0 9600 1              write_register 1        1"      , filename);
@@ -71,6 +71,7 @@ pub fn main() -> Result<(), Error> {
       // Function code: 0x01   Write single   Discrete Output Coil
       let mut dest = vec![0u8; 1];
       assert!(modbus.read_bits(register, 1, &mut dest).is_ok());
+      println!("Value read:{:?}", dest);
     }
 
     "write_coil" => {

@@ -1,6 +1,6 @@
 [package]
 name = "quick-modbus"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Mario Baldini <mario.baldini@gmail.com>"]
 edition = "2018"
 
