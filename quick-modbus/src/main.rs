@@ -26,13 +26,13 @@ pub fn main() -> Result<(), Error> {
   let args: Vec<String> = env::args().collect();
   let filename = &args[0];
   
-  if args.len() != 6 && args.len() != 7 {
+  if args.len() != 10 && args.len() != 11 {
     println!("Error! Missing arguments! Received: {:?} \nUsage example:", args);
-    println!("./{:} LOG_LEVEL PORT_NAME    BAUD DATABIT PARITY STOP_BIT DEVICE_ADDR    COMMAND        REGISTER [VALUE]", filename);
-    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              write_register 1        1"      , filename);
-    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              write_coil     1        1"      , filename);
-    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              read_register  1         "      , filename);
-    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              read_coil      1         "      , filename);
+    println!("{:} LOG_LEVEL PORT_NAME    BAUD DATABIT PARITY STOP_BIT DEVICE_ADDR    COMMAND        REGISTER [VALUE]", filename);
+    println!("{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              write_register 1        1"      , filename);
+    println!("{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              write_coil     1        1"      , filename);
+    println!("{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              read_register  1         "      , filename);
+    println!("{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              read_coil      1         "      , filename);
     process::exit(1);
   }
 
