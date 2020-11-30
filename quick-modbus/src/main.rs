@@ -28,38 +28,52 @@ pub fn main() -> Result<(), Error> {
   
   if args.len() != 6 && args.len() != 7 {
     println!("Error! Missing arguments! Received: {:?} \nUsage example:", args);
-    println!("./{:} PORT_NAME    BAUD DEVICE_ADDRESS COMMAND        REGISTER [VALUE]", filename);
-    println!("./{:} /dev/ttyUSB0 9600 1              write_register 1        1"      , filename);
-    println!("./{:} /dev/ttyUSB0 9600 1              write_coil     1        1"      , filename);
-    println!("./{:} /dev/ttyUSB0 9600 1              read_register  1         "      , filename);
-    println!("./{:} /dev/ttyUSB0 9600 1              read_coil      1         "      , filename);
+    println!("./{:} LOG_LEVEL PORT_NAME    BAUD DATABIT PARITY STOP_BIT DEVICE_ADDR    COMMAND        REGISTER [VALUE]", filename);
+    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              write_register 1        1"      , filename);
+    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              write_coil     1        1"      , filename);
+    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              read_register  1         "      , filename);
+    println!("./{:} verbose   /dev/ttyUSB0 9600 8       N      1        1              read_coil      1         "      , filename);
     process::exit(1);
   }
 
-  let port_name      = &args[1];
-  let baud           =  args[2].parse::<i32>().unwrap();
-  let device_address =  args[3].parse::<u8>().unwrap();
-  let cmd            =  args[4].as_str();
-  let register       =  args[5].parse::<u16>().unwrap();
+  let log_level      =  args[1].as_str();
+  let port_name      = &args[2];
+  let baud           =  args[3].parse::<i32>().unwrap();
+  let data_bit       =  args[4].parse::<i32>().unwrap();
+  let parity         =  args[5].parse::<char>().unwrap();
+  let stop_bit       =  args[6].parse::<i32>().unwrap();
+  let device_address =  args[7].parse::<u8>().unwrap();
+  let cmd            =  args[8].as_str();
+  let register       =  args[9].parse::<u16>().unwrap();
   let mut value: u16 = 0;
   if args.len() == 7 { 
     value           =   args[6].parse::<u16>().unwrap();
   }
 
-  let mut modbus = Modbus::new_rtu(port_name, baud, 'N', 8, 1).unwrap();
+  let mut modbus = Modbus::new_rtu(port_name, baud, parity, data_bit, stop_bit).unwrap();
   modbus.set_slave(device_address)?;
-  modbus.set_debug(true)?;
+  
+  if log_level == "verbose" {
+    modbus.set_debug(true)?;
+  }
+  
 
   modbus.connect()?;
 
   match cmd { 
     "read_register" => {
       // Function code: 0x03   Read single  Analog Output Holding Register
-      println!("\nReading register: {:?}", register);
       let mut dest = vec![0u16; 1];
       assert!(modbus.read_registers(register, 1, &mut dest).is_ok());
-      println!("Value read:{:?}", dest);
-      println!("{:?}", dest);
+
+      if log_level == "verbose" {
+        println!("\nReading register: {:?}", register);
+        println!("Value read:{:?}", dest);  
+      } else {
+        println!("{:?}", dest);  
+      }
+      
+      
     }
 
     "write_register" => {
@@ -72,8 +86,14 @@ pub fn main() -> Result<(), Error> {
       // Function code: 0x01   Write single   Discrete Output Coil
       let mut dest = vec![0u8; 1];
       assert!(modbus.read_bits(register, 1, &mut dest).is_ok());
-      println!("Value read:{:?}", dest);
-      println!("{:?}", dest);
+
+      if log_level == "verbose" {
+        println!("Value read:{:?}", dest);
+      } else {
+        println!("{:?}", dest);  
+      }
+      
+      
     }
 
     "write_coil" => {
