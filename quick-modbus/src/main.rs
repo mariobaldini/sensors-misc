@@ -4,8 +4,10 @@
 //              Can be compiled and run in multiple targets (PC, Raspberry PI, Beaglebone, etc)
 
 // Build requirements:
-// sudo apt install --install-recommends linux-libc-dev librust-libc-dev libcxxtools-dev glibc-source libc++-dev clang autoconf curl libtool librust-libc+rustc-dep-of-std-dev librust-libc+rustc-std-workspace-core-dev gnu-standards gettext 
-// ? apt-get install autoconf build-essential curl clang-3.9 git-core libtool
+// sudo apt install linux-libc-dev librust-libc-dev libcxxtools-dev glibc-source libc++-dev clang autoconf curl libtool librust-libc+rustc-dep-of-std-dev librust-libc+rustc-std-workspace-core-dev gnu-standards gettext 
+// cargo install cross
+// cross build --release --target armv7-unknown-linux-gnueabihf
+
 
 extern crate libmodbus_rs;
 extern crate failure;
