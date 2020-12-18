@@ -20,8 +20,8 @@ pub fn main() -> Result<(), Error> {
   const VERSION: &'static str = env!("CARGO_PKG_VERSION");
 
   println!("----------- QUICK-MODBUS  ver. {:} ----------", VERSION);
-  println!("Author: Mario Baldini <mariobaldini@gmail.com>");
-  println!("-----------------------------------------------");
+  println!("https://github.com/mariobaldini/sensors-misc/tree/master/quick-modbus");
+  println!("");
 
   let args: Vec<String> = env::args().collect();
   let filename = &args[0];
@@ -47,7 +47,7 @@ pub fn main() -> Result<(), Error> {
   let register       =  args[9].parse::<u16>().unwrap();
   let mut value: u16 = 0;
   if args.len() == 7 { 
-    value           =   args[6].parse::<u16>().unwrap();
+    value           =   args[10].parse::<u16>().unwrap();
   }
 
   let mut modbus = Modbus::new_rtu(port_name, baud, parity, data_bit, stop_bit).unwrap();
