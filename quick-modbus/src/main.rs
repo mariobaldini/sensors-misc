@@ -48,7 +48,7 @@ pub fn main() -> Result<(), Error> {
   let cmd            =  args[8].as_str();
   let register       =  args[9].parse::<u16>().unwrap();
   let mut value: u16 = 0;
-  if args.len() == 7 { 
+  if args.len() == 11 { 
     value           =   args[10].parse::<u16>().unwrap();
   }
 
